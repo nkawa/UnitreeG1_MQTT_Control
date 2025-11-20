@@ -12,6 +12,7 @@ class UnitreeG1_MQTT:
   def __init__(self):
        self.mqtt_ctrl_topic = None  # 現在制御 を受けているゴーグル・ブラウザのトピック
        self.last_registered = None
+       self.client = None
 
   def on_connect(self, client, userdata, connect_flags, reason_code, properties):
                # ロボットのメタ情報の中身はとりあえず
@@ -92,9 +93,10 @@ class UnitreeG1_MQTT:
 if __name__ == '__main__':
   
   uni = UnitreeG1_MQTT()
-  umon = UnigreeG1_JointMonitor(uni.client)
-  ucont = UnigreeG1_JointController()
   uni.connect_mqtt()  # registration
+  umon = UnitreeG1_JointMonitor(uni.client)
+  ucont = UnitreeG1_JointController()
+  
   uni.setJointControl(ucont)
   uni.client_loop()
 
