@@ -21,7 +21,7 @@ class UnitreeG1_JointMonitor:
       UnitreeG1_JointMonitor.monitor_instance = self
       self.client = mqtt_client    
       ChannelFactoryInitialize(0, "enp2s0")
-      self.sub = ChannelSubscriber("rt/lowstate", LowState_)
+      self.sub = ChannelSubscriber("rt/lf/lowstate", LowState_)
       self.sub.Init(LowStateHandler, 10)
       self.left = None
       self.right = None
