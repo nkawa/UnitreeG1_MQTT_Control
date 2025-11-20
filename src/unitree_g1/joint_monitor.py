@@ -44,10 +44,12 @@ def LowStateHandler(msg: LowState_):
     ms = msg.motor_state
     uni.low_state = msg
     leftrad = [ms[15].q,ms[16].q, ms[17].q, ms[18].q, ms[19].q ,ms[20].q, ms[21].q]
-    leftdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, leftrad))
-    rightrad = [ms[22].q,ms[23].q, ms[24].q, ms[25].q, ms[26].q ,ms[27].q, ms[28].q]         
-    rightdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, rightrad))        
- #   print("LR:",leftdeg, rightdeg)
+#    leftdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, leftrad))
+    leftrad = list(map(lambda r:int(r*100000)/100000, leftrad))
+    rightrad = [ms[22].q,ms[23].q, ms[24].q, ms[25].q, ms[26].q ,ms[27].q, ms[28].q]     
+    rightrad = list(map(lambda r:int(r*100000)/100000, rightrad))    
+#    rightdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, rightrad))        
+    print("R:",rightrad)
 
     uni.publish_state(leftrad, rightrad)
     
