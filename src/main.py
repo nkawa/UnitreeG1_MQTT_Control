@@ -49,8 +49,8 @@ class UnitreeG1_MQTT:
             if self.mqtt_ctrl_topic is not None:
               self.client.unsubscribe(self.mqtt_ctrl_topic)    
               self.mqtt_ctrl_topic = mqtt_ctrl_topic
-              self.client.subscribe(self.mqtt_ctrl_topic)
-              self.logger.info("subscribe to: " + self.mqtt_ctrl_topic)
+          self.client.subscribe(self.mqtt_ctrl_topic)
+          print("MQTT Subscribe to: " + self.mqtt_ctrl_topic)
 
       elif msg.topic == mqtt_ctrl_topic : # 制御コマンド受信
           print("Control command received:", msg.topic)
