@@ -22,6 +22,7 @@ class UnitreeG1_JointController:
       UnitreeG1_JointController.controller_instance = self
       ChannelFactoryInitialize(0, "enp2s0")
       self.pub = ChannelPublisher("rt/lf/lowcmd", LowCmd_)  
+      self.pub.Init()
 
       self.low_cmd = unitree_hg_msg_dds__LowCmd_()
 #      self.low_cmd = LowCmd_([0, 0], 0, 0, [0, 0], [0, 0], 0, [unitree_go_msg_dds__MotorCmd_() for i in range(20)],
