@@ -45,10 +45,9 @@ class UnitreeG1_JointController:
           G1JointIndex.WaistPitch
       ]
   
-  def send_arm_command(self, left, right): 
+  def send_right_arm_command(self, right): 
       # まえの時間との差分
       self.low_cmd.motor_cmd[G1JointIndex.kNotUsedJoint].q =  1 # 1:Enable arm_sdk, 0:D
-      np_left = np.array(left)
       np_right = np.array(right)
       #まずは右手だけ
       if self.mon.right is None:
@@ -62,7 +61,7 @@ class UnitreeG1_JointController:
         return
      
       #for debug
-      print("Send arm command:", np_left, np_right)
+      print("Send right arm command:", right)
       return
       
       for i, joint in enumerate(self.arm_joints):

@@ -53,12 +53,11 @@ class UnitreeG1_MQTT:
           print("MQTT Subscribe to: " + self.mqtt_ctrl_topic)
 
       elif msg.topic == self.mqtt_ctrl_topic : # 制御コマンド受信
-          print("Control command received:", msg.topic)
+#          print("Control command received:", msg.topic)
           js = json.loads(msg.payload)
-          if 'left' in js and 'right' in js:
-              left = js['left']
+          if 'right' in js :
               right = js['right']
-              self.joint_controller.send_arm_command(left, right)
+              self.joint_controller.send_right_arm_command(right)
           else:
               print("Invalid joint command message:", js)
   
