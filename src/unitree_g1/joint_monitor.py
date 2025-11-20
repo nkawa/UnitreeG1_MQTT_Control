@@ -9,6 +9,7 @@ from .joint_index import G1JointIndex
 
 from paho.mqtt import client as mqtt
 
+ROBOT_UUID = "UnitreeG1-remote-vr"
 MQTT_ROBOT_STATE_TOPIC = "robot/"+ROBOT_UUID
 
 class UnigreeG1_JointMonitor:
