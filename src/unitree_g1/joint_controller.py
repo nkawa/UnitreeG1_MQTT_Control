@@ -20,8 +20,8 @@ class UnitreeG1_JointController:
       if UnitreeG1_JointController.controller_instance is not None:
         raise Exception("Only one instance of UnigreeG1_JointController is allowed.")        
       UnitreeG1_JointController.controller_instance = self
-      ChannelFactoryInitialize(0, "enp2s0")
-      self.pub = ChannelPublisher("rt/lf/lowcmd", LowCmd_)  
+ #     ChannelFactoryInitialize(0, "enp2s0")
+      self.pub = ChannelPublisher("rt/arm_sdk", LowCmd_)  
       self.pub.Init()
 
       self.low_cmd = unitree_hg_msg_dds__LowCmd_()
