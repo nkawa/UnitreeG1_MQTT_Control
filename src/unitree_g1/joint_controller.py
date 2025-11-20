@@ -24,6 +24,10 @@ class UnitreeG1_JointController:
       self.pub = ChannelPublisher("rt/lf/lowcmd", LowCmd_)  
 
       self.low_cmd = unitree_hg_msg_dds__LowCmd_()
+#      self.low_cmd = LowCmd_([0, 0], 0, 0, [0, 0], [0, 0], 0, [unitree_go_msg_dds__MotorCmd_() for i in range(20)],
+#                unitree_go_msg_dds__BmsCmd_(),
+#                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+#                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0], 0, 0, 0)
       self.crc = CRC()
       self.last_sent = None
       while UnitreeG1_JointMonitor.monitor_instance is None:        
@@ -62,7 +66,7 @@ class UnitreeG1_JointController:
         return
      
       #for debug
-#      print("Send right arm command:", right)
+      print("SR:", right)
 #      return
       
       for i, joint in enumerate(self.arm_joints):
@@ -78,7 +82,7 @@ class UnitreeG1_JointController:
         mcmd.kd = 1.5
         mcmd.tau_ff = 0.
     
-      self.low_cmd = self.crc.Crc(self.low_cmd)
+      self.low_cmd.crc = self.crc.Crc(self.low_cmd)
       self.pub.Write(self.low_cmd)
       
   def send_left_arm_command(self, left): 
@@ -108,5 +112,5 @@ class UnitreeG1_JointController:
         mcmd.kd = 1.5
         mcmd.tau_ff = 0.
     
-      self.low_cmd = self.crc.Crc(self.low_cmd)
+      self.low_cmd.crc = self.crc.Crc(self.low_cmd)
       self.pub.Write(self.low_cmd)
