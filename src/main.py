@@ -86,7 +86,7 @@ class UnitreeG1_MQTT:
   def client_loop(self):
        self.client.loop_forever()
        
-  def setJointControl(self, joint_controller: UnigreeG1_JointController):
+  def setJointControl(self, joint_controller: UnitreeG1_JointController):
       self.joint_controller = joint_controller      
 
 
