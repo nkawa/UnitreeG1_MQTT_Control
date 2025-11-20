@@ -25,11 +25,11 @@ class UnitreeG1_JointController:
       self.low_cmd = unitree_hg_msg_dds__LowCmd_()
       self.crc = CRC()
       self.last_sent = None
-      while UnitreeG1_JointController.monitor_instance is None:        
+      while UnitreeG1_JointMonitor.monitor_instance is None:        
         print("Waiting for JointMonitor instance...")
         time.sleep(0.5)
 
-      self.mon = UnitreeG1_JointController.monitor_instance
+      self.mon = UnitreeG1_JointMonitor.monitor_instance
       
       self.arm_joints = [
           G1JointIndex.LeftShoulderPitch,  G1JointIndex.LeftShoulderRoll,
