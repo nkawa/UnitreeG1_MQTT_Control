@@ -4,8 +4,8 @@ import json
 import time
 import datetime
 from paho.mqtt import client as mqtt
-from unitree_g1.joint_controller import UnigreeG1_JointController
-from unitree_g1.joint_monitor import UnigreeG1_JointMonitor
+from unitree_g1.joint_controller import UnitreeG1_JointController
+from unitree_g1.joint_monitor import UnitreeG1_JointMonitor
 from mqtt_config import *
 
 class UnitreeG1_MQTT:
@@ -38,8 +38,8 @@ class UnitreeG1_MQTT:
       self.client.subscribe(MQTT_MANAGE_RCV_TOPIC)
        
   def on_message(self, client, userdata, msg):
-       print("From MQTT Get",userdata,msg)
-       if(msg.topic == MQTT_MANAGE_RCV_TOPIC): # 制御元のVRゴーグル・ブラウザからのメッセージ
+      print("From MQTT Get",userdata,msg)
+      if(msg.topic == MQTT_MANAGE_RCV_TOPIC): # 制御元のVRゴーグル・ブラウザからのメッセージ
           js = json.loads(msg.payload)
           goggles_id = js["devId"]
           mqtt_ctrl_topic = MQTT_CTRL_TOPIC + "/" + goggles_id
@@ -49,11 +49,16 @@ class UnitreeG1_MQTT:
               self.mqtt_ctrl_topic = mqtt_ctrl_topic
               self.client.subscribe(self.mqtt_ctrl_topic)
               self.logger.info("subscribe to: " + self.mqtt_ctrl_topic)
-          with self.mqtt_control_lock:
-                    js["topic_type"] = "dev"
-                    js["topic"] = msg.topic
-                    self.mqtt_control_dict.clear()
-                    self.mqtt_control_dict.update(js)
+
+      elif msg.topic == mqtt_ctrl_topic : # 制御コマンド受信
+          print("Control command received:", msg.topic)
+          js = json.loads(msg.payload)
+          if 'left' in js and 'right' in js:
+              left = js['left']
+              right = js['right']
+              self.joint_controller.send_arm_command(left, right)
+          else:
+              print("Invalid joint command message:", js)
   
   def on_disconnect(
         self,
@@ -81,24 +86,15 @@ class UnitreeG1_MQTT:
        self.client.loop_forever()
        
   def setJointControl(self, joint_controller: UnigreeG1_JointController):
-      self.joint_controller = joint_controller
-      self.client.message_callback_add(MQTT_CTRL_TOPIC + "/+", self.joint_control_message)
+      self.joint_controller = joint_controller      
 
-  def joint_control_message(self, client, userdata, msg):
-      print("Joint control message received:", msg.topic)
-      js = json.loads(msg.payload)
-      if 'left' in js and 'right' in js:
-          left = js['left']
-          right = js['right']
-          self.joint_controller.send_arm_command(left, right)
-      else:
-          print("Invalid joint command message:", js)
 
 if __name__ == '__main__':
   
   uni = UnitreeG1_MQTT()
   umon = UnigreeG1_JointMonitor(uni.client)
   ucont = UnigreeG1_JointController()
-  uni.connect_mqtt();  
+  uni.connect_mqtt()  # registration
   uni.setJointControl(ucont)
+  uni.client_loop()
 

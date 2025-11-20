@@ -12,13 +12,13 @@ from paho.mqtt import client as mqtt
 ROBOT_UUID = "UnitreeG1-remote-vr"
 MQTT_ROBOT_STATE_TOPIC = "robot/"+ROBOT_UUID
 
-class UnigreeG1_JointMonitor:
+class UnitreeG1_JointMonitor:
   monitor_instance = None
   def __init__(self, mqtt_client: mqtt.Client):
-      if UnigreeG1_JointMonitor.monitor_instance is not None:
+      if UnitreeG1_JointMonitor.monitor_instance is not None:
         raise Exception("Only one instance of UnigreeG1_JointMonitor is allowed.")
         
-      UnigreeG1_JointMonitor.monitor_instance = self
+      UnitreeG1_JointMonitor.monitor_instance = self
       self.client = mqtt_client    
       ChannelFactoryInitialize(0, "enp2s0")
       self.sub = ChannelSubscriber("rt/lf/lowstate", LowState_)
@@ -38,7 +38,7 @@ class UnigreeG1_JointMonitor:
   
 # LowState ハンドラ　⇒　モータ状態を MQTT で Publish
 def LowStateHandler(msg: LowState_):
-    uni = UnigreeG1_JointMonitor.monitor_instance
+    uni = UnitreeG1_JointMonitor.monitor_instance
     print("Version: ", msg.version, "Machine, mode ", msg.mode_machine, msg.mode_pr)
     #        print("Motor len:", len(msg.motor_state))
     ms = msg.motor_state

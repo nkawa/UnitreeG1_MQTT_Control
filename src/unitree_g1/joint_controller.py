@@ -13,23 +13,23 @@ from unitree_sdk2py.utils.crc import CRC
 from .joint_index import G1JointIndex
 from .joint_monitor import UnigreeG1_JointMonitor
 
-class UnigreeG1_JointController:
+class UnitreeG1_JointController:
   controller_instance = None
   def __init__(self):
-      if UnigreeG1_JointController.controller_instance is not None:
+      if UnitreeG1_JointController.controller_instance is not None:
         raise Exception("Only one instance of UnigreeG1_JointController is allowed.")        
-      UnigreeG1_JointController.controller_instance = self
+      UnitreeG1_JointController.controller_instance = self
       ChannelFactoryInitialize(0, "enp2s0")
       self.pub = ChannelPublisher("rt/lf/lowcmd", LowCmd_)  
 
       self.low_cmd = unitree_hg_msg_dds__LowCmd_()
       self.crc = CRC()
       self.last_sent = None
-      while UnigreeG1_JointMonitor.monitor_instance is None:        
+      while UnitreeG1_JointController.monitor_instance is None:        
         print("Waiting for JointMonitor instance...")
         time.sleep(0.5)
 
-      self.mon = UnigreeG1_JointMonitor.monitor_instance
+      self.mon = UnitreeG1_JointController.monitor_instance
       
       self.arm_joints = [
           G1JointIndex.LeftShoulderPitch,  G1JointIndex.LeftShoulderRoll,
