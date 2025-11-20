@@ -52,7 +52,7 @@ class UnitreeG1_MQTT:
           self.client.subscribe(self.mqtt_ctrl_topic)
           print("MQTT Subscribe to: " + self.mqtt_ctrl_topic)
 
-      elif msg.topic == mqtt_ctrl_topic : # 制御コマンド受信
+      elif msg.topic == self.mqtt_ctrl_topic : # 制御コマンド受信
           print("Control command received:", msg.topic)
           js = json.loads(msg.payload)
           if 'left' in js and 'right' in js:
