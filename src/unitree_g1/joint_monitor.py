@@ -5,7 +5,7 @@ import numpy as np
 
 from unitree_sdk2py.core.channel import ChannelSubscriber, ChannelFactoryInitialize
 from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowState_
-from joint_index import G1JointIndex
+from .joint_index import G1JointIndex
 
 from paho.mqtt import client as mqtt
 

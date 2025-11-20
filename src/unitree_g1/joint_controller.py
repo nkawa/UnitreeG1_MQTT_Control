@@ -10,8 +10,8 @@ from unitree_sdk2py.idl.unitree_hg.msg.dds_ import LowCmd_
 from unitree_sdk2py.idl.default import unitree_hg_msg_dds__LowCmd_
 from unitree_sdk2py.utils.crc import CRC
 
-from joint_index import G1JointIndex
-from joint_monitor import UnigreeG1_JointMonitor
+from .joint_index import G1JointIndex
+from .joint_monitor import UnigreeG1_JointMonitor
 
 class UnigreeG1_JointController:
   controller_instance = None
