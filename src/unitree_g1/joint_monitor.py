@@ -33,7 +33,7 @@ class UnitreeG1_JointMonitor:
            "right": right
       }
       self.left = np.array(left)
-      self.right = np.array(right)
+      self.right = np.array(right) #degree!
       self.client.publish(MQTT_ROBOT_STATE_TOPIC , json.dumps(info))
   
 # LowState ハンドラ　⇒　モータ状態を MQTT で Publish
@@ -43,11 +43,12 @@ def LowStateHandler(msg: LowState_):
     #        print("Motor len:", len(msg.motor_state))
     ms = msg.motor_state
     uni.low_state = msg
-    msarray = [ms[15].q,ms[16].q, ms[17].q, ms[18].q, ms[19].q ,ms[20].q, ms[21].q]
-    leftdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, msarray))
-    msarray = [ms[22].q,ms[23].q, ms[24].q, ms[25].q, ms[26].q ,ms[27].q, ms[28].q]         
-    rightdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, msarray))        
+    leftrad = [ms[15].q,ms[16].q, ms[17].q, ms[18].q, ms[19].q ,ms[20].q, ms[21].q]
+    leftdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, leftrad))
+    rightrad = [ms[22].q,ms[23].q, ms[24].q, ms[25].q, ms[26].q ,ms[27].q, ms[28].q]         
+    rightdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, rightrad))        
  #   print("LR:",leftdeg, rightdeg)
 
-    uni.publish_state(leftdeg, rightdeg);
+    uni.publish_state(leftrad, rightrad)
+    
 

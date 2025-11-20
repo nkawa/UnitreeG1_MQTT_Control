@@ -50,6 +50,7 @@ class UnitreeG1_JointController:
       # まえの時間との差分
       self.low_cmd.motor_cmd[G1JointIndex.kNotUsedJoint].q =  1 # 1:Enable arm_sdk, 0:D
       np_right = np.deg2rad(np.array(right)) # 
+      np_right = np.array(right)
       #まずは右手だけ
       if self.mon.right is None:
         print("No monitor data yet.")
