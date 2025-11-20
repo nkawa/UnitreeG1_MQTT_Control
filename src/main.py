@@ -41,6 +41,7 @@ class UnitreeG1_MQTT:
   def on_message(self, client, userdata, msg):
       print("From MQTT Get",userdata,msg)
       if(msg.topic == MQTT_MANAGE_RCV_TOPIC): # 制御元のVRゴーグル・ブラウザからのメッセージ
+          print("Get Manage message:", msg.topic, msg.payload)
           js = json.loads(msg.payload)
           goggles_id = js["devId"]
           mqtt_ctrl_topic = MQTT_CTRL_TOPIC + "/" + goggles_id
