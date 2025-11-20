@@ -39,7 +39,7 @@ class UnitreeG1_MQTT:
       self.client.subscribe(MQTT_MANAGE_RCV_TOPIC)
        
   def on_message(self, client, userdata, msg):
-      print("From MQTT Get",userdata,msg)
+#      print("From MQTT Get",userdata,msg)
       if(msg.topic == MQTT_MANAGE_RCV_TOPIC): # 制御元のVRゴーグル・ブラウザからのメッセージ
           print("Get Manage message:", msg.topic, msg.payload)
           js = json.loads(msg.payload)
@@ -55,11 +55,15 @@ class UnitreeG1_MQTT:
       elif msg.topic == self.mqtt_ctrl_topic : # 制御コマンド受信
 #          print("Control command received:", msg.topic)
           js = json.loads(msg.payload)
-          if 'right' in js :
-              right = js['right']
-              self.joint_controller.send_right_arm_command(right)
+          if 'arm' in js :
+              arm = js['arm']
+              if arm  == 'right':
+                  right = js['joints']
+                  self.joint_controller.send_right_arm_command(right)
           else:
               print("Invalid joint command message:", js)
+      else:
+          print("Unknown topic message:", msg.topic, msg.payload)
   
   def on_disconnect(
         self,
