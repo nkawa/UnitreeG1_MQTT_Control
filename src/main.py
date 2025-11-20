@@ -60,6 +60,9 @@ class UnitreeG1_MQTT:
               if arm  == 'right':
                   right = js['joints']
                   self.joint_controller.send_right_arm_command(right)
+              elif arm == 'left':
+                  left = js['joints']
+                  self.joint_controller.send_left_arm_command(left)
           else:
               print("Invalid joint command message:", js)
       else:

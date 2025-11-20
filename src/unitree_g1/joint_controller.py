@@ -49,7 +49,7 @@ class UnitreeG1_JointController:
   def send_right_arm_command(self, right): 
       # まえの時間との差分
       self.low_cmd.motor_cmd[G1JointIndex.kNotUsedJoint].q =  1 # 1:Enable arm_sdk, 0:D
-      np_right = np.deg2rad(np.array(right)) # 
+#      np_right = np.deg2rad(np.array(right)) # 
       np_right = np.array(right)
       #まずは右手だけ
       if self.mon.right is None:
@@ -62,12 +62,42 @@ class UnitreeG1_JointController:
         return
      
       #for debug
-      print("Send right arm command:", right)
-      return
+#      print("Send right arm command:", right)
+#      return
       
       for i, joint in enumerate(self.arm_joints):
         if joint >= G1JointIndex.RightShoulderPitch and joint <= G1JointIndex.RightWristYaw:          
           self.low_cmd.motor_cmd[joint].q = right[joint-G1JointIndex.RightShoulderPitch]
+        else:
+          self.low_cmd.motor_cmd[joint].q = self.mon.low_state.motor_state[joint].q
+
+        mcmd = self.low_cmd.motor_cmd[joint]
+        mcmd.tau = 0.
+        mcmd.kp = 60.
+        mcmd.dq = 0.
+        mcmd.kd = 1.5
+        mcmd.tau_ff = 0.
+    
+      self.low_cmd = self.crc.Crc(self.low_cmd)
+      self.pub.Write(self.low_cmd)
+      
+  def send_left_arm_command(self, left): 
+      # まえの時間との差分
+      self.low_cmd.motor_cmd[G1JointIndex.kNotUsedJoint].q =  1 # 1:Enable arm_sdk, 0:D
+      np_left = np.array(left)
+
+      if self.mon.left is None:
+        print("No monitor data yet.")
+        return
+      max_diff = np.abs(np_left - self.mon.left ).max() 
+      
+      if max_diff > 5.0:
+        print("Detected large diff in arm command:", max_diff, np_left, self.mon.left)
+        return
+     
+      for i, joint in enumerate(self.arm_joints):
+        if joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
+          self.low_cmd.motor_cmd[joint].q = left[joint-G1JointIndex.LeftShoulderPitch]
         else:
           self.low_cmd.motor_cmd[joint].q = self.mon.low_state.motor_state[joint].q
 

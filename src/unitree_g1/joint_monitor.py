@@ -16,7 +16,7 @@ class UnitreeG1_JointMonitor:
   monitor_instance = None
   def __init__(self, mqtt_client: mqtt.Client):
       if UnitreeG1_JointMonitor.monitor_instance is not None:
-        raise Exception("Only one instance of UnigreeG1_JointMonitor is allowed.")
+        raise Exception("Only one instance of UnitreeG1_JointMonitor is allowed.")
         
       UnitreeG1_JointMonitor.monitor_instance = self
       self.client = mqtt_client    
