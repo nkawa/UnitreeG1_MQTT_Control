@@ -39,7 +39,7 @@ class UnitreeG1_JointMonitor:
 # LowState ハンドラ　⇒　モータ状態を MQTT で Publish
 def LowStateHandler(msg: LowState_):
     uni = UnitreeG1_JointMonitor.monitor_instance
-    print("Version: ", msg.version, "Machine, mode ", msg.mode_machine, msg.mode_pr)
+#    print("Version: ", msg.version, "Machine, mode ", msg.mode_machine, msg.mode_pr)
     #        print("Motor len:", len(msg.motor_state))
     ms = msg.motor_state
     uni.low_state = msg
@@ -47,7 +47,7 @@ def LowStateHandler(msg: LowState_):
     leftdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, msarray))
     msarray = [ms[22].q,ms[23].q, ms[24].q, ms[25].q, ms[26].q ,ms[27].q, ms[28].q]         
     rightdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, msarray))        
-    print("LR:",leftdeg, rightdeg)
+ #   print("LR:",leftdeg, rightdeg)
 
     uni.publish_state(leftdeg, rightdeg);
 
