@@ -116,8 +116,8 @@ class ProcessManager:
         self.conrolP = None # JointController プロセス
         self.UniMQ = None # MQTT インスタンス
         
-        self.sm = mp.shared_memory.SharedMemory(SHM_NAME)
-        self.pose = np.ndarray((SHM_SIZE,), dtype=np.dtype("float32"), buffer=self.sm.buf)
+#        self.sm = mp.shared_memory.SharedMemory(SHM_NAME)
+ #       self.pose = np.ndarray((SHM_SIZE,), dtype=np.dtype("float32"), buffer=self.sm.buf)
         
 
     def start_mqtt(self): # MQTT メイン
