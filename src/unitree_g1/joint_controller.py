@@ -14,6 +14,8 @@ from unitree_sdk2py.utils.crc import CRC
 from .joint_index import G1JointIndex
 from .joint_monitor import UnitreeG1_JointMonitor
 
+
+## マルチプロセス対応版にすべき？
 class UnitreeG1_JointController:
   controller_instance = None
   def __init__(self):
@@ -74,9 +76,9 @@ class UnitreeG1_JointController:
         mcmd = self.low_cmd.motor_cmd[joint]
         if joint >= G1JointIndex.RightShoulderPitch and joint <= G1JointIndex.RightWristYaw:          
           mcmd.q = right[joint-G1JointIndex.RightShoulderPitch]
+          mcmd.dq = 0.
           mcmd.tau = 0.
           mcmd.kp = 60.
-          mcmd.dq = 0.
           mcmd.kd = 1.5
           mcmd.tau_ff = 0.
         else:
@@ -108,15 +110,21 @@ class UnitreeG1_JointController:
       for i, joint in enumerate(self.arm_joints):
         if joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
           self.low_cmd.motor_cmd[joint].q = left[joint-G1JointIndex.LeftShoulderPitch]
+          mcmd.q = left[joint-G1JointIndex.LeftShoulderPitch]
+          mcmd.tau = 0.
+          mcmd.kp = 60.
+          mcmd.dq = 0.
+          mcmd.kd = 1.5
+          mcmd.tau_ff = 0.
         else:
-          self.low_cmd.motor_cmd[joint].q = self.mon.low_state.motor_state[joint].q
-
-        mcmd = self.low_cmd.motor_cmd[joint]
-        mcmd.tau = 0.
-        mcmd.kp = 60.
-        mcmd.dq = 0.
-        mcmd.kd = 1.5
-        mcmd.tau_ff = 0.
+          lsms = self.mon.low_state.motor_state[joint]
+          mcmd.q = lsms.q
+          mcmd.tau = 0.
+          mcmd.kp  = 60.
+          mcmd.dq  = lsms.dq
+          mcmd.kd  = 1.5
+          mcmd.tau_ff = 0.
+    
     
       self.low_cmd.crc = self.crc.Crc(self.low_cmd)
       self.pub.Write(self.low_cmd)
