@@ -64,10 +64,20 @@ class UnitreeG1_JointController:
         return
       max_diff = np.abs(np_right - self.mon.right ).max() 
       
-      if max_diff > 5.0:
-        print("Detected large diff in arm command:", max_diff, np_right, self.mon.right)
+      if max_diff > 5.0/180*math.pi:
+        print("Detected large right diff in arm command:", max_diff, np_right, self.mon.right)
         return
-     
+  
+      left = None    
+      if time.perf_counter()- self.left_savetime < 0.1:  # under 100msec
+        np_left = np.array(self.saved_left_command)
+
+        max_diff = np.abs(np_left - self.mon.left ).max() 
+        if max_diff > 5.0/180*math.pi:
+          print("Detected large left diff in arm command:", max_diff, np_left, self.mon.left)
+          return
+        left = self.saved_left_command
+           
       #for debug
 #      print("SR:", right)
 #      return
@@ -81,34 +91,7 @@ class UnitreeG1_JointController:
           mcmd.kp = 60.
           mcmd.kd = 1.5
           mcmd.tau_ff = 0.
-        else:
-          lsms = self.mon.low_state.motor_state[joint]
-          mcmd.q = lsms.q
-          mcmd.tau = 0.
-          mcmd.kp  = 60.
-          mcmd.dq  = lsms.dq
-          mcmd.kd  = 1.5
-          mcmd.tau_ff = 0.
-    
-      self.low_cmd.crc = self.crc.Crc(self.low_cmd)
-      self.pub.Write(self.low_cmd)
-      
-  def send_left_arm_command(self, left): 
-      # まえの時間との差分
-      self.low_cmd.motor_cmd[G1JointIndex.kNotUsedJoint].q =  1 # 1:Enable arm_sdk, 0:D
-      np_left = np.array(left)
-
-      if self.mon.left is None:
-        print("No monitor data yet.")
-        return
-      max_diff = np.abs(np_left - self.mon.left ).max() 
-      
-      if max_diff > 5.0:
-        print("Detected large diff in arm command:", max_diff, np_left, self.mon.left)
-        return
-     
-      for i, joint in enumerate(self.arm_joints):
-        if joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
+        elif left != None and joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
           self.low_cmd.motor_cmd[joint].q = left[joint-G1JointIndex.LeftShoulderPitch]
           mcmd.q = left[joint-G1JointIndex.LeftShoulderPitch]
           mcmd.tau = 0.
@@ -125,6 +108,11 @@ class UnitreeG1_JointController:
           mcmd.kd  = 1.5
           mcmd.tau_ff = 0.
     
-    
       self.low_cmd.crc = self.crc.Crc(self.low_cmd)
       self.pub.Write(self.low_cmd)
+      
+  def save_left_arm_command(self, left):
+      self.saved_left_command = left
+      self.left_savetime = time.perf_counter()
+    
+      

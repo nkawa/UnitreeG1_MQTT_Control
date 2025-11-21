@@ -6,7 +6,17 @@ import datetime
 from paho.mqtt import client as mqtt
 from unitree_g1.joint_controller import UnitreeG1_JointController
 from unitree_g1.joint_monitor import UnitreeG1_JointMonitor
+from unitree_g1.config import SHM_NAME, SHM_SIZE, SHM_INDEX
 from mqtt_config import *
+import numpy as np
+
+# マルチプロセス対応
+# プロセス間通信は Shared Memory で
+#  0: MQTT Process
+#  1: Joint Monitor Process　 -> 1kHz で情報を受け取るけど publish は 20Hz程度
+#  2: Joint Controller Process -> 500Hz くらいで制御情報を送りたい
+import multiprocessing as mp
+from multiprocessing import Process
 
 class UnitreeG1_MQTT:
   def __init__(self):
@@ -62,7 +72,7 @@ class UnitreeG1_MQTT:
                   self.joint_controller.send_right_arm_command(right)
               elif arm == 'left':
                   left = js['joints']
-                  self.joint_controller.send_left_arm_command(left)
+                  self.joint_controller.save_left_arm_command(left)
           else:
               print("Invalid joint command message:", js)
       else:
@@ -97,13 +107,53 @@ class UnitreeG1_MQTT:
       self.joint_controller = joint_controller      
 
 
-if __name__ == '__main__':
+##
+# 　複数プロセスをまとめる！
+
+class ProcessManager:
+    def __init__(self):
+        self.monP = None # JointMonitor プロセス
+        self.conrolP = None # JointController プロセス
+        self.UniMQ = None # MQTT インスタンス
+        
+        self.sm = mp.shared_memory.SharedMemory(SHM_NAME)
+        self.pose = np.ndarray((SHM_SIZE,), dtype=np.dtype("float32"), buffer=self.sm.buf)
+        
+
+    def start_mqtt(self): # MQTT メイン
+        self.UniMQ = UnitreeG1_MQTT()
+        self.UniMQ.connect_mqtt()
+    
+    def start_monitor(self, logging_dir: str | None = None, disable_mqtt: bool = False):
+        self.mon = UnitreeG1_JointMonitor(self.UniMQ.client)
+#        self.monP = Process(
+#            target=self.mon.run_proc,
+#            args=(self.monitor_dict,
+#                  self.monitor_lock,
+##                  self.log_queue,
+ #                 self.monitor_pipe,
+ #                 logging_dir,
+ #                 disable_mqtt),
+ #           name="UnitreeG1_monitor")
+ #       self.monP.start()
+  #      self.state_monitor = True
   
-  uni = UnitreeG1_MQTT()
-  uni.connect_mqtt()  # registration
-  umon = UnitreeG1_JointMonitor(uni.client)
-  ucont = UnitreeG1_JointController()
+    def start_joint_controller(self):
+        self.joint_controller = UnitreeG1_JointController()
+        self.set_joint_control(self.joint_controller)
   
-  uni.setJointControl(ucont)
-  uni.client_loop()
+    def set_joint_control(self, joint_controller: UnitreeG1_JointController):
+        self.UniMQ.setJointControl(joint_controller)
+        
+    def start_mqtt_loop(self):
+        self.UniMQ.client_loop()
+
+if __name__ == '__main__':  
+  unipro = ProcessManager()
+  unipro.start_mqtt()  # registration
+  unipro.start_monitor()
+  unipro.start_joint_controller()
+    
+  unipro.start_mqtt_loop()
+  
 
