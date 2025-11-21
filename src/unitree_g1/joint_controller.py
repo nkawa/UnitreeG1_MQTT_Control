@@ -67,21 +67,27 @@ class UnitreeG1_JointController:
         return
      
       #for debug
-      print("SR:", right)
+#      print("SR:", right)
 #      return
       
       for i, joint in enumerate(self.arm_joints):
-        if joint >= G1JointIndex.RightShoulderPitch and joint <= G1JointIndex.RightWristYaw:          
-          self.low_cmd.motor_cmd[joint].q = right[joint-G1JointIndex.RightShoulderPitch]
-        else:
-          self.low_cmd.motor_cmd[joint].q = self.mon.low_state.motor_state[joint].q
-
         mcmd = self.low_cmd.motor_cmd[joint]
-        mcmd.tau = 0.
-        mcmd.kp = 60.
-        mcmd.dq = 0.
-        mcmd.kd = 1.5
-        mcmd.tau_ff = 0.
+        if joint >= G1JointIndex.RightShoulderPitch and joint <= G1JointIndex.RightWristYaw:          
+          mcmd.q = right[joint-G1JointIndex.RightShoulderPitch]
+          mcmd.tau = 0.
+          mcmd.kp = 60.
+          mcmd.dq = 0.
+          mcmd.kd = 1.5
+          mcmd.tau_ff = 0.
+        else:
+          lsms = self.mon.low_state.motor_state[joint]
+          mcmd[joint].q = lsms.q
+          mcmd.tau = 0. = lsms.tau
+          mcmd.kp = 60. = lsms.kp
+          mcmd.dq = 0.  = lsms.dq
+          mcmd.kd = 1.5 = lsms.kd
+          mcmd.tau_ff = 0. =lsms.tau_ff
+
     
       self.low_cmd.crc = self.crc.Crc(self.low_cmd)
       self.pub.Write(self.low_cmd)
