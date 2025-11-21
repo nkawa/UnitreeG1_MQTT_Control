@@ -59,12 +59,13 @@ def LowStateHandler(msg: LowState_):
 #    leftdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, leftrad))
 #    leftrad = list(map(lambda r:int(r*100000)/100000, leftrad))
     rightrad = [ms[22].q,ms[23].q, ms[24].q, ms[25].q, ms[26].q ,ms[27].q, ms[28].q]     
-#    rightrad = list(map(lambda r:int(r*100000)/100000, rightrad))    
+    rightdsp = list(map(lambda r:int(r*100000)/100000, rightrad))    
 #    rightdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, rightrad))        
 
-    print("R:",rightrad, now-last_run, call_count)
+    if call_count > 60:
+        print("R:",rightdsp, now-last_run, call_count)
+        call_count = 0    
     uni.publish_state(leftrad, rightrad)
-    call_count = 0
     last_run = now
 
     
