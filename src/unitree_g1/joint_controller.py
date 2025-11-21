@@ -82,11 +82,11 @@ class UnitreeG1_JointController:
         else:
           lsms = self.mon.low_state.motor_state[joint]
           mcmd.q = lsms.q
-          mcmd.tau = lsms.tau
-          mcmd.kp  = lsms.kp
+          mcmd.tau = 0.
+          mcmd.kp  = 60.
           mcmd.dq  = lsms.dq
-          mcmd.kd  = lsms.kd
-          mcmd.tau_ff  =lsms.tau_ff
+          mcmd.kd  = 1.5
+          mcmd.tau_ff = 0.
     
       self.low_cmd.crc = self.crc.Crc(self.low_cmd)
       self.pub.Write(self.low_cmd)
