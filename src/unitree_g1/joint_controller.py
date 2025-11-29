@@ -64,7 +64,7 @@ class UnitreeG1_JointController:
         return
       max_diff = np.abs(np_right - self.mon.right ).max() 
       
-      if max_diff > 5.0/180*math.pi:
+      if max_diff > 25.0/180*math.pi:
         print("Detected large right diff in arm command:", max_diff, np_right, self.mon.right)
         return
   
@@ -73,7 +73,7 @@ class UnitreeG1_JointController:
         np_left = np.array(self.saved_left_command)
 
         max_diff = np.abs(np_left - self.mon.left ).max() 
-        if max_diff > 5.0/180*math.pi:
+        if max_diff > 25.0/180*math.pi:
           print("Detected large left diff in arm command:", max_diff, np_left, self.mon.left)
           return
         left = self.saved_left_command

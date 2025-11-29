@@ -6,6 +6,7 @@ import datetime
 from paho.mqtt import client as mqtt
 from unitree_g1.joint_controller import UnitreeG1_JointController
 from unitree_g1.joint_monitor import UnitreeG1_JointMonitor
+from unitree_g1.dex3_mon_cont import UnitreeG1_Dex3MonitorController
 from unitree_g1.config import SHM_NAME, SHM_SIZE, SHM_INDEX
 from mqtt_config import *
 import numpy as np
@@ -70,9 +71,18 @@ class UnitreeG1_MQTT:
               if arm  == 'right':
                   right = js['joints']
                   self.joint_controller.send_right_arm_command(right)
+                  if js['button'][0]: # close
+                        self.joint_controller.send_right_hand_command(1)
+                  elif js['button'][1]: # open
+                        self.joint_controller.send_right_hand_command(-1)
+                
               elif arm == 'left':
                   left = js['joints']
                   self.joint_controller.save_left_arm_command(left)
+                  if js['button'][0]: # close
+                        self.joint_controller.send_left_hand_command(1)
+                  elif js['button'][1]: # open
+                        self.joint_controller.send_left_hand_command(-1)   
           else:
               print("Invalid joint command message:", js)
       else:
@@ -115,6 +125,7 @@ class ProcessManager:
         self.monP = None # JointMonitor プロセス
         self.conrolP = None # JointController プロセス
         self.UniMQ = None # MQTT インスタンス
+        self.dex3_mon_con = None
         
 #        self.sm = mp.shared_memory.SharedMemory(SHM_NAME)
  #       self.pose = np.ndarray((SHM_SIZE,), dtype=np.dtype("float32"), buffer=self.sm.buf)
@@ -144,6 +155,9 @@ class ProcessManager:
   
     def set_joint_control(self, joint_controller: UnitreeG1_JointController):
         self.UniMQ.setJointControl(joint_controller)
+    
+    def start_dex3_monitor_controller(self):
+        self.dex3_mon_con = UnitreeG1_Dex3MonitorController(self.UniMQ.client)
         
     def start_mqtt_loop(self):
         self.UniMQ.client_loop()
@@ -153,6 +167,8 @@ if __name__ == '__main__':
   unipro.start_mqtt()  # registration
   unipro.start_monitor()
   unipro.start_joint_controller()
+  
+  unipro.start_dex3_monitor_controller()
     
   unipro.start_mqtt_loop()
   
