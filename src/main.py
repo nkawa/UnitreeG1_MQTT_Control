@@ -7,6 +7,7 @@ from paho.mqtt import client as mqtt
 from unitree_g1.joint_controller import UnitreeG1_JointController
 from unitree_g1.joint_monitor import UnitreeG1_JointMonitor
 from unitree_g1.dex3_mon_cont import UnitreeG1_Dex3MonitorController
+from unitree_g1.sport_control import UnitreeG1_SportModeController
 from unitree_g1.config import SHM_NAME, SHM_SIZE, SHM_INDEX
 from mqtt_config import *
 import numpy as np
@@ -75,7 +76,9 @@ class UnitreeG1_MQTT:
                         self.joint_controller.send_right_hand_command(1)
                   elif js['button'][1]: # open
                         self.joint_controller.send_right_hand_command(-1)
-                
+                  if abs(js['thumbstick'][0])+abs(js['thumbstick'][1])>= 0.6:
+                      self.sport_con.move(js['thumbstick'][0]/2.0, js['thumbstick'][1]/2.0)
+                                      
               elif arm == 'left':
                   left = js['joints']
                   self.joint_controller.save_left_arm_command(left)
@@ -83,6 +86,10 @@ class UnitreeG1_MQTT:
                         self.joint_controller.send_left_hand_command(1)
                   elif js['button'][1]: # open
                         self.joint_controller.send_left_hand_command(-1)   
+                        
+                  if abs(js['thumbstick'][0]) >= 0.3:
+                      self.sport_con.turn(js['thumbstick'][0]/2.0)
+
           else:
               print("Invalid joint command message:", js)
       else:
@@ -126,6 +133,7 @@ class ProcessManager:
         self.conrolP = None # JointController プロセス
         self.UniMQ = None # MQTT インスタンス
         self.dex3_mon_con = None
+        self.sport_con = None
         
 #        self.sm = mp.shared_memory.SharedMemory(SHM_NAME)
  #       self.pose = np.ndarray((SHM_SIZE,), dtype=np.dtype("float32"), buffer=self.sm.buf)
@@ -158,6 +166,9 @@ class ProcessManager:
     
     def start_dex3_monitor_controller(self):
         self.dex3_mon_con = UnitreeG1_Dex3MonitorController(self.UniMQ.client)
+    
+    def start_sport_controller(self):
+        self.sport_con = UnitreeG1_SportModeController(self.UniMQ.client) 
         
     def start_mqtt_loop(self):
         self.UniMQ.client_loop()
