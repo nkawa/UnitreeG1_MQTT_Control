@@ -113,13 +113,14 @@ def LowStateHandler(msg: LowState_):
     #        print("Motor len:", len(msg.motor_state))
     ms = msg.motor_state
     #        msarray = [ms[13].q, ms[14].q, ms[15].q,ms[16].q, ms[17].q, ms[18].q, ms[19].q ]
-    msarray = [ms[15].q,ms[16].q, ms[17].q, ms[18].q, ms[19].q ,ms[20].q, ms[21].q]
-    leftdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, msarray))
-    msarray = [ms[22].q,ms[23].q, ms[24].q, ms[25].q, ms[26].q ,ms[27].q, ms[28].q]         
-    rightdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, msarray))        
-    print("LR:",leftdeg, rightdeg)
+    lmsarray = [ms[15].q,ms[16].q, ms[17].q, ms[18].q, ms[19].q ,ms[20].q, ms[21].q]
+    leftdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, lmsarray))
+    rmsarray = [ms[22].q,ms[23].q, ms[24].q, ms[25].q, ms[26].q ,ms[27].q, ms[28].q]         
+    rightdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, rmsarray))        
+#    print("LR:",leftdeg, rightdeg)
+    print("msarray",rmsarray, lmsarray)
 
-    uni.publish_state(leftdeg, rightdeg);
+#    uni.publish_state(leftdeg, rightdeg)
 
 if __name__ == "__main__":
 

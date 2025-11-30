@@ -22,7 +22,7 @@ class UnitreeG1_SportModeController:
   def move(self, x, y):
     if time.perf_counter() - self.last_move < 0.8:
       return
-    ret = self.sport_client.Move(x,y,0)
+    ret = self.sport_client.Move(-y,-x,0)
     print("Move ",y,x, ret)
     self.last_move = time.perf_counter()
 #    if (x > y):
@@ -33,7 +33,7 @@ class UnitreeG1_SportModeController:
   def turn(self, z):
     if time.perf_counter() - self.last_turn < 0.8:
       return
-    ret = self.sport_client.Move(0,0,z)
+    ret = self.sport_client.Move(0,0,-z)
     print("Turn ",z, "ret", ret)
     self.last_turn = time.perf_counter()    
     

@@ -105,7 +105,7 @@ class UnitreeG1_JointController:
           mcmd.tau_ff = 0.
         else:
           lsms = self.mon.low_state.motor_state[joint]
-          mcmd.q = lsms.q
+          mcmd.q = 0
           mcmd.tau = 0.
           mcmd.kp  = 60.
           mcmd.dq  = lsms.dq
