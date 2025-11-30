@@ -48,13 +48,13 @@ def HandStateHandlerLeft(msg: HandState_):
 
 
 
-class UnitreeG1_Dex3Monitor:
+class UnitreeG1_Dex3MonitorController:
     monitor_instance = None
     def __init__(self, mqtt_client: mqtt.Client):
-        if UnitreeG1_Dex3Monitor.monitor_instance is not None:
+        if UnitreeG1_Dex3MonitorController.monitor_instance is not None:
             raise Exception("Only one instance of UnitreeG1_Dex3Monitor is allowed.")
         
-        UnitreeG1_Dex3Monitor.monitor_instance = self
+        UnitreeG1_Dex3MonitorController.monitor_instance = self
         self.client = mqtt_client
 
         self.r_curr_time = time.perf_counter()
@@ -75,6 +75,8 @@ class UnitreeG1_Dex3Monitor:
         self.leftClosePos = 0
         self.r_init = True
         self.l_init = True
+        self.r_last_time = time.perf_counter()
+        self.l_last_time = self.r_last_time
 
     def HandStateHandler(self, msg: HandState_):
         curr_time = time.perf_counter()
@@ -93,7 +95,7 @@ class UnitreeG1_Dex3Monitor:
             self.rightClosePos = np.clip( np.mean(diff_ratios), 0.0, 1.0)
             return
     
-    def HandStateHandler(self, msg: HandState_):
+    def HandStateHandlerLeft(self, msg: HandState_):
         curr_time = time.perf_counter()
         ms = msg.motor_state
         self.l_msarray = [ ms[0].q, ms[1].q, ms[2].q, ms[3].q, ms[4].q ,ms[5].q, ms[6].q ]

@@ -73,9 +73,9 @@ class UnitreeG1_MQTT:
                   right = js['joints']
                   self.joint_controller.send_right_arm_command(right)
                   if js['button'][0]: # close
-                        self.joint_controller.send_right_hand_command(1)
+                        self.dex3_contoller.send_right_hand_command(1)
                   elif js['button'][1]: # open
-                        self.joint_controller.send_right_hand_command(-1)
+                        self.dex3_contoller.send_right_hand_command(-1)
                   if abs(js['thumbstick'][0])+abs(js['thumbstick'][1])>= 0.6:
                       self.sport_con.move(js['thumbstick'][0]/2.0, js['thumbstick'][1]/2.0)
                                       
@@ -83,12 +83,12 @@ class UnitreeG1_MQTT:
                   left = js['joints']
                   self.joint_controller.save_left_arm_command(left)
                   if js['button'][0]: # close
-                        self.joint_controller.send_left_hand_command(1)
+                        self.dex3_contoller.send_left_hand_command(1)
                   elif js['button'][1]: # open
-                        self.joint_controller.send_left_hand_command(-1)   
+                        self.dex3_contoller.send_left_hand_command(-1)   
                         
                   if abs(js['thumbstick'][0]) >= 0.3:
-                      self.sport_con.turn(js['thumbstick'][0]/2.0)
+                      self.sport_controller.turn(js['thumbstick'][0]/2.0)
 
           else:
               print("Invalid joint command message:", js)
@@ -121,7 +121,13 @@ class UnitreeG1_MQTT:
        self.client.loop_forever()
        
   def setJointControl(self, joint_controller: UnitreeG1_JointController):
-      self.joint_controller = joint_controller      
+      self.joint_controller = joint_controller    
+
+  def setDex3Contol(self, d3con)
+      self.dex3_contoller = d3con
+
+  def setSportContol(self, spocon)
+      self.sport_controller = spocon
 
 
 ##
@@ -166,9 +172,11 @@ class ProcessManager:
     
     def start_dex3_monitor_controller(self):
         self.dex3_mon_con = UnitreeG1_Dex3MonitorController(self.UniMQ.client)
+        self.UniMQ.setDex3Contol(self.dex3_mon_con)
     
     def start_sport_controller(self):
         self.sport_con = UnitreeG1_SportModeController(self.UniMQ.client) 
+        self.UniMQ.setSportContol(self.sport_con)
         
     def start_mqtt_loop(self):
         self.UniMQ.client_loop()
@@ -178,6 +186,8 @@ if __name__ == '__main__':
   unipro.start_mqtt()  # registration
   unipro.start_monitor()
   unipro.start_joint_controller()
+  
+  unipro.start_sport_controller()
   
   unipro.start_dex3_monitor_controller()
     
