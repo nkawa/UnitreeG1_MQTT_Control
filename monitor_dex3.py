@@ -40,8 +40,8 @@ def HandStateHandler(msg: HandState_):
     
    msarray = [ ms[0].q, ms[1].q, ms[2].q, ms[3].q, ms[4].q ,ms[5].q, ms[6].q ]
 #    print("Motor:", msg.motor_state)
-   print("Right:", list(map(lambda r:int((r*180/math.pi)*1000)/1000, msarray)))   
-   print("RightDeg:",  msarray)  
+   print("Finger:", list(map(lambda r:int((r*180/math.pi)*1000)/1000, msarray)))   
+   print("FingerDeg:",  msarray)  
    print("Mode", ms[0].mode, ms[1].mode, ms[2].mode, ms[3].mode, ms[4].mode ,ms[5].mode, ms[6].mode )
 
     #        msarray = [ms[13].q, ms[14].q, ms[15].q,ms[16].q, ms[17].q, ms[18].q, ms[19].q ]

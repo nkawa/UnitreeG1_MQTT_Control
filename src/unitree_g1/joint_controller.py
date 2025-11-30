@@ -111,7 +111,7 @@ class UnitreeG1_JointController:
     
       self.low_cmd.crc = self.crc.Crc(self.low_cmd)
 # for sport debug
-#      self.pub.Write(self.low_cmd)
+      self.pub.Write(self.low_cmd)
       
   def save_left_arm_command(self, left):
       self.saved_left_command = left
