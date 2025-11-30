@@ -80,6 +80,11 @@ class UnitreeG1_MQTT:
                         print("Open Right")
                   if abs(js['thumbstick'][0])+abs(js['thumbstick'][1])>= 0.6:
                       self.sport_controller.move(js['thumbstick'][0]/2.0, js['thumbstick'][1]/2.0)
+
+                  if js['grip']==True:  # grip が来たら　デフォルトに戻したい！
+                      print("JS! ", js['grip'])
+                      self.joint_controller.reset_right_arm()
+
                                       
               elif arm == 'left':
                   left = js['joints']
@@ -93,6 +98,12 @@ class UnitreeG1_MQTT:
                         
                   if abs(js['thumbstick'][0]) >= 0.3:
                       self.sport_controller.turn(js['thumbstick'][0]/2.0)
+
+                  if js['grip']== "true":  # grip が来たら　デフォルトに戻したい！
+                
+                      self.joint_controller.reset_left_arm()
+
+
 
           else:
               print("Invalid joint command message:", js)

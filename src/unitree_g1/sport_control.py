@@ -13,14 +13,28 @@ from unitree_sdk2py.g1.loco.g1_loco_client import LocoClient
 class UnitreeG1_SportModeController:
   def __init__(self,  mqtt_client: mqtt.Client):
     self.sport_client = LocoClient()
+    self.sport_client.SetTimeout(10.0)
+    self.sport_client.Init()
+    self.last_move = time.perf_counter()
+    self.last_turn = time.perf_counter()
+    
   
   def move(self, x, y):
-    print("Move ",x,y)
-    self.sport_client.Move(x,y,0)
+    if time.perf_counter() - self.last_move < 0.8:
+      return
+    ret = self.sport_client.Move(x,y,0)
+    print("Move ",y,x, ret)
+    self.last_move = time.perf_counter()
+#    if (x > y):
+#      ret = self.sport_client.Move(0.3,0,0)
+#    else:
+#      ret = self.sport_client.Move(0, 0.3, 0)
     
   def turn(self, z):
-    print("Turn ",z)
-    self.sport_client.Move(0,0,z)
-    
+    if time.perf_counter() - self.last_turn < 0.8:
+      return
+    ret = self.sport_client.Move(0,0,z)
+    print("Turn ",z, "ret", ret)
+    self.last_turn = time.perf_counter()    
     
 

@@ -24,7 +24,10 @@ class UnitreeG1_JointController:
       UnitreeG1_JointController.controller_instance = self
  #     ChannelFactoryInitialize(0, "enp2s0")
       self.left_savetime = 0
+      self.saved_left_command = None
+#      self.pub = ChannelPublisher("rt/arm_sdk", LowCmd_)  
       self.pub = ChannelPublisher("rt/arm_sdk", LowCmd_)  
+#      self.pub = ChannelPublisher("rt/lowcmd", LowCmd_)  
       self.pub.Init()
 
       self.low_cmd = unitree_hg_msg_dds__LowCmd_()
@@ -117,4 +120,103 @@ class UnitreeG1_JointController:
       self.saved_left_command = left
       self.left_savetime = time.perf_counter()
     
-      
+  
+  def reset_right_arm(self):
+    target = [-0.27433091402053833, -0.12286414206027985, -0.03733086213469505, 0.26636138558387756, -0.037870150059461594, -0.32020315527915955, 0.23122461140155792] 
+
+    self.low_cmd.motor_cmd[G1JointIndex.kNotUsedJoint].q =  1 # 1:Enable arm_sdk, 0:D
+    np_right = np.array(target)
+    
+    diff = np_right - self.mon.right 
+    div = 2
+
+    #角度変化の最大値を 10度以下にする分割数
+    while np.abs(diff/div).max() > 10/180*math.pi:
+      div += 1
+      if div > 30:
+        break
+
+    left = self.saved_left_command
+
+    for ita in range(div):           
+      for i, joint in enumerate(self.arm_joints):
+        mcmd = self.low_cmd.motor_cmd[joint]
+        if joint >= G1JointIndex.RightShoulderPitch and joint <= G1JointIndex.RightWristYaw:         
+          index =  joint-G1JointIndex.RightShoulderPitch
+          mcmd.q = self.mon.right[index] + (diff[index]/div * (ita+1))
+          mcmd.dq = 0.
+          mcmd.tau = 0.
+          mcmd.kp = 60.
+          mcmd.kd = 1.5
+          mcmd.tau_ff = 0.
+        elif left != None and joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
+          self.low_cmd.motor_cmd[joint].q = left[joint-G1JointIndex.LeftShoulderPitch]
+          mcmd.q = left[joint-G1JointIndex.LeftShoulderPitch]
+          mcmd.tau = 0.
+          mcmd.kp = 60.
+          mcmd.dq = 0.
+          mcmd.kd = 1.5
+          mcmd.tau_ff = 0.
+        else:
+          lsms = self.mon.low_state.motor_state[joint]
+          mcmd.q = lsms.q
+          mcmd.tau = 0.
+          mcmd.kp  = 60.
+          mcmd.dq  = lsms.dq
+          mcmd.kd  = 1.5
+          mcmd.tau_ff = 0.
+    
+      self.low_cmd.crc = self.crc.Crc(self.low_cmd)
+      self.pub.Write(self.low_cmd)
+      time.sleep(0.1)
+
+
+  def reset_left_arm(self):
+    target =   [-0.10218948870897293, 0.1596677154302597, -0.04013517126441002, -0.01477654930204153, -0.08196011930704117, -0.0996243879199028, -0.11140535771846771]
+
+    self.low_cmd.motor_cmd[G1JointIndex.kNotUsedJoint].q =  1 # 1:Enable arm_sdk, 0:D
+    np_left = np.array(target)
+    
+    diff = np_left - self.mon.left
+    div = 2
+
+    #角度変化の最大値を 10度以下にする分割数
+    while np.abs(diff/div).max() > 10/180*math.pi:
+      div += 1
+      if div > 30:
+        break
+
+    right = self.mon.right
+
+    for ita in range(div):           
+      for i, joint in enumerate(self.arm_joints):
+        mcmd = self.low_cmd.motor_cmd[joint]
+        if joint >= G1JointIndex.RightShoulderPitch and joint <= G1JointIndex.RightWristYaw:         
+          index =  joint-G1JointIndex.RightShoulderPitch
+          mcmd.q = right[index] 
+          mcmd.dq = 0.
+          mcmd.tau = 0.
+          mcmd.kp = 60.
+          mcmd.kd = 1.5
+          mcmd.tau_ff = 0.
+        elif left != None and joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
+          index =  joint-G1JointIndex.LeftShoulderPitch
+          mcmd.q = self.mon.left[index]+ (diff[index]/div *(ita+1))
+          mcmd.tau = 0.
+          mcmd.kp = 60.
+          mcmd.dq = 0.
+          mcmd.kd = 1.5
+          mcmd.tau_ff = 0.
+        else:
+          lsms = self.mon.low_state.motor_state[joint]
+          mcmd.q = lsms.q
+          mcmd.tau = 0.
+          mcmd.kp  = 60.
+          mcmd.dq  = lsms.dq
+          mcmd.kd  = 1.5
+          mcmd.tau_ff = 0.
+    
+      self.low_cmd.crc = self.crc.Crc(self.low_cmd)
+      self.pub.Write(self.low_cmd)
+      time.sleep(0.1)
+
