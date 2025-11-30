@@ -84,7 +84,7 @@ class UnitreeG1_Dex3MonitorController:
         self.r_msarray = [ ms[0].q, ms[1].q, ms[2].q, ms[3].q, ms[4].q ,ms[5].q, ms[6].q ]
         if curr_time - self.r_last_time > 0.5:
             self.r_last_time = curr_time   
-            print("Right: ", str(list(map(lambda r:int((r*180/math.pi)*1000)/1000, self.r_msarray))))
+#            print("Right: ", str(list(map(lambda r:int((r*180/math.pi)*1000)/1000, self.r_msarray))))
 
         # 最も近いclosePos を見つけるべし。。。
         # 全部の差分の割合の平均でいいかな。。。        
@@ -101,7 +101,7 @@ class UnitreeG1_Dex3MonitorController:
         self.l_msarray = [ ms[0].q, ms[1].q, ms[2].q, ms[3].q, ms[4].q ,ms[5].q, ms[6].q ]
         if curr_time - self.l_last_time > 0.5:
             self.l_last_time = curr_time   
-            print("Left : ",str(list(map(lambda r:int((r*180/math.pi)*1000)/1000, self.l_msarray))))        
+#            print("Left : ",str(list(map(lambda r:int((r*180/math.pi)*1000)/1000, self.l_msarray))))        
         if self.l_init: # 初めて受け取った
             self.l_init = False
             rms = np.array(self.l_msarray)
@@ -110,7 +110,8 @@ class UnitreeG1_Dex3MonitorController:
             return
 
     def send_right_hand_command(self, dir): 
-        if self.r_init == False:
+        if self.r_init:
+            print("Not Yet Initialized Rihgt hand")
             return  # 受信するまでは命令しない
 
         if dir > 0:
@@ -121,6 +122,7 @@ class UnitreeG1_Dex3MonitorController:
             self.rightClosePos -= 0.05
             if self.rightClosePos < 0.0:
                 self.rightClosePos = 0.0
+        print("Right Status ", self.rightClosePos)
   
         cmd = unitree_hg_msg_dds__HandCmd_()
         q = [0,0,0,0,0,0,0]
@@ -135,7 +137,8 @@ class UnitreeG1_Dex3MonitorController:
             self.pubR.Write(cmd) 
     
     def send_left_hand_command(self, dir): 
-        if self.l_init == False:
+        if self.l_init:
+            print("Not Yet Initialized Rihgt hand")          
             return  # 受信するまでは命令しない
 
         if dir > 0:
@@ -146,7 +149,8 @@ class UnitreeG1_Dex3MonitorController:
             self.leftClosePos -= 0.05
             if self.leftClosePos < 0.0:
                 self.leftClosePos = 0.0
-  
+        print("Left Status ", self.leftClosePos)
+
         cmd = unitree_hg_msg_dds__HandCmd_()
         q = [0,0,0,0,0,0,0]
         for i in range(7):      

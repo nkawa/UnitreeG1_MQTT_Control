@@ -74,18 +74,22 @@ class UnitreeG1_MQTT:
                   self.joint_controller.send_right_arm_command(right)
                   if js['button'][0]: # close
                         self.dex3_contoller.send_right_hand_command(1)
+                        print("Close Right")
                   elif js['button'][1]: # open
                         self.dex3_contoller.send_right_hand_command(-1)
+                        print("Open Right")
                   if abs(js['thumbstick'][0])+abs(js['thumbstick'][1])>= 0.6:
-                      self.sport_con.move(js['thumbstick'][0]/2.0, js['thumbstick'][1]/2.0)
+                      self.sport_controller.move(js['thumbstick'][0]/2.0, js['thumbstick'][1]/2.0)
                                       
               elif arm == 'left':
                   left = js['joints']
                   self.joint_controller.save_left_arm_command(left)
                   if js['button'][0]: # close
                         self.dex3_contoller.send_left_hand_command(1)
+                        print("Close Left")
                   elif js['button'][1]: # open
                         self.dex3_contoller.send_left_hand_command(-1)   
+                        print("Open Left")
                         
                   if abs(js['thumbstick'][0]) >= 0.3:
                       self.sport_controller.turn(js['thumbstick'][0]/2.0)
@@ -123,10 +127,10 @@ class UnitreeG1_MQTT:
   def setJointControl(self, joint_controller: UnitreeG1_JointController):
       self.joint_controller = joint_controller    
 
-  def setDex3Contol(self, d3con)
+  def setDex3Contol(self, d3con):
       self.dex3_contoller = d3con
 
-  def setSportContol(self, spocon)
+  def setSportContol(self, spocon):
       self.sport_controller = spocon
 
 

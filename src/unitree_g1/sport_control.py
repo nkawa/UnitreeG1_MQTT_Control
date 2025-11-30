@@ -15,9 +15,11 @@ class UnitreeG1_SportModeController:
     self.sport_client = LocoClient()
   
   def move(self, x, y):
+    print("Move ",x,y)
     self.sport_client.Move(x,y,0)
     
   def turn(self, z):
+    print("Turn ",z)
     self.sport_client.Move(0,0,z)
     
     

@@ -63,7 +63,7 @@ def LowStateHandler(msg: LowState_):
 #    rightdeg = list(map(lambda r:int((r*180/math.pi)*1000)/1000, rightrad))        
 
     if call_count > 200:
-        print("R:",rightdsp, now-last_run, call_count)
+#        print("R:",rightdsp, now-last_run, call_count)
         call_count = 0    
     uni.publish_state(leftrad, rightrad)
     last_run = now
