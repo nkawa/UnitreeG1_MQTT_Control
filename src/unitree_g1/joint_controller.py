@@ -30,6 +30,7 @@ class UnitreeG1_JointController:
 #      self.pub = ChannelPublisher("rt/lowcmd", LowCmd_)  
       self.pub.Init()
 
+      self.waist_yaw = 0 # 腰の角度
       self.low_cmd = unitree_hg_msg_dds__LowCmd_()
 #      self.low_cmd = LowCmd_([0, 0], 0, 0, [0, 0], [0, 0], 0, [unitree_go_msg_dds__MotorCmd_() for i in range(20)],
 #                unitree_go_msg_dds__BmsCmd_(),
@@ -105,7 +106,10 @@ class UnitreeG1_JointController:
           mcmd.tau_ff = 0.
         else:
           lsms = self.mon.low_state.motor_state[joint]
-          mcmd.q = 0
+          if joint == G1JointIndex.WaistYaw:
+            mcmd.q = self.waist_yaw
+          else:
+            mcmd.q = 0
           mcmd.tau = 0.
           mcmd.kp  = 60.
           mcmd.dq  = lsms.dq
@@ -122,6 +126,7 @@ class UnitreeG1_JointController:
     
   
   def reset_right_arm(self):
+    print("Reset right!")
     target = [-0.27433091402053833, -0.12286414206027985, -0.03733086213469505, 0.26636138558387756, -0.037870150059461594, -0.32020315527915955, 0.23122461140155792] 
 
     self.low_cmd.motor_cmd[G1JointIndex.kNotUsedJoint].q =  1 # 1:Enable arm_sdk, 0:D
@@ -172,6 +177,8 @@ class UnitreeG1_JointController:
 
 
   def reset_left_arm(self):
+    print("Reset right!")
+ 
     target =   [-0.10218948870897293, 0.1596677154302597, -0.04013517126441002, -0.01477654930204153, -0.08196011930704117, -0.0996243879199028, -0.11140535771846771]
 
     self.low_cmd.motor_cmd[G1JointIndex.kNotUsedJoint].q =  1 # 1:Enable arm_sdk, 0:D
@@ -219,4 +226,9 @@ class UnitreeG1_JointController:
       self.low_cmd.crc = self.crc.Crc(self.low_cmd)
       self.pub.Write(self.low_cmd)
       time.sleep(0.1)
+      
+  def turn_waist(self, dir):
+    self.waist_yaw += dir
+    
+
 

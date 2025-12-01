@@ -98,6 +98,13 @@ class UnitreeG1_MQTT:
                         
                   if abs(js['thumbstick'][0]) >= 0.3:
                       self.sport_controller.turn(js['thumbstick'][0]/2.0)
+                    
+                  if abs(js['thumbstick'][1]) >= 0.3:
+                      if js['thumbstick'][1] > 0:
+                          self.joint_controller.turn_waist(0.02)
+                      else:
+                          self.joint_controller.turn_waist(-0.02)
+                          
 
                   if js['grip']== "true":  # grip が来たら　デフォルトに戻したい！
                 
