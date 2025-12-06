@@ -59,60 +59,52 @@ class UnitreeG1_MQTT:
           mqtt_ctrl_topic = MQTT_CTRL_TOPIC + "/" + goggles_id
           if mqtt_ctrl_topic != self.mqtt_ctrl_topic:
             if self.mqtt_ctrl_topic is not None:
-              self.client.unsubscribe(self.mqtt_ctrl_topic)    
+              self.client.unsubscribe(self.mqtt_ctrl_topic+"-left")
+              self.client.unsubscribe(self.mqtt_ctrl_topic+"-right")
           self.mqtt_ctrl_topic = mqtt_ctrl_topic
-          self.client.subscribe(self.mqtt_ctrl_topic)
+          self.client.subscribe(self.mqtt_ctrl_topic+"-left")
+          self.client.subscribe(self.mqtt_ctrl_topic+"-right")
           print("MQTT Subscribe to: " + self.mqtt_ctrl_topic)
 
-      elif msg.topic == self.mqtt_ctrl_topic : # 制御コマンド受信
+      elif msg.topic == self.mqtt_ctrl_topic+"-right" : # 制御コマンド受信
 #          print("Control command received:", msg.topic)
           js = json.loads(msg.payload)
-          if 'arm' in js :
-              arm = js['arm']
-              if arm  == 'right':
-                  right = js['joints']
-                  self.joint_controller.send_right_arm_command(right)
-                  if js['button'][0]: # close
-                        self.dex3_contoller.send_right_hand_command(1)
-                        print("Close Right")
-                  elif js['button'][1]: # open
-                        self.dex3_contoller.send_right_hand_command(-1)
-                        print("Open Right")
-                  if abs(js['thumbstick'][0])+abs(js['thumbstick'][1])>= 0.6:
-                      self.sport_controller.move(js['thumbstick'][0]/2.0, js['thumbstick'][1]/2.0)
+          right = js['joints']
+          self.joint_controller.send_right_arm_command(right)
+          if js['button'][0]: # close
+            self.dex3_contoller.send_right_hand_command(1)
+ #              print("Close Right")
+          elif js['button'][1]: # open
+            self.dex3_contoller.send_right_hand_command(-1)
+#                        print("Open Right")
+          if abs(js['thumbstick'][0])+abs(js['thumbstick'][1])>= 0.6:
+            self.sport_controller.move(js['thumbstick'][0]/2.0, js['thumbstick'][1]/2.0)
 
 #                  if js['grip']==True:  # grip が来たら　デフォルトに戻したい！
 #                      print("JS! ", js['grip'])
 #                      self.joint_controller.reset_right_arm()
 
-                                      
-              elif arm == 'left':
-                  left = js['joints']
-                  self.joint_controller.save_left_arm_command(left)
-                  if js['button'][0]: # close
-                        self.dex3_contoller.send_left_hand_command(1)
-                        print("Close Left")
-                  elif js['button'][1]: # open
-                        self.dex3_contoller.send_left_hand_command(-1)   
-                        print("Open Left")
+      elif msg.topic == self.mqtt_ctrl_topic+"-left": # 制御コマンド受信
+           left = js['joints']
+           self.joint_controller.save_left_arm_command(left)
+           if js['button'][0]: # close
+               self.dex3_contoller.send_left_hand_command(1)
+#               print("Close Left")
+           elif js['button'][1]: # open
+               self.dex3_contoller.send_left_hand_command(-1)   
+#                        print("Open Left")
                         
-                  if abs(js['thumbstick'][0]) >= 0.3:
-                      self.sport_controller.turn(js['thumbstick'][0]/2.0)
+           if abs(js['thumbstick'][0]) >= 0.3:
+               self.sport_controller.turn(js['thumbstick'][0]/2.0)
                     
-                  if abs(js['thumbstick'][1]) >= 0.3:
-                      if js['thumbstick'][1] > 0:
-                          self.joint_controller.turn_waist(0.005)
-                      else:
-                          self.joint_controller.turn_waist(-0.005)
-                          
-
+           if abs(js['thumbstick'][1]) >= 0.3:
+               if js['thumbstick'][1] > 0:
+                   self.joint_controller.turn_waist(0.005)
+               else:
+                   self.joint_controller.turn_waist(-0.005)
+                        
 #                  if js['grip']== "true":  # grip が来たら　デフォルトに戻したい！
 #                      self.joint_controller.reset_left_arm()
-
-
-
-          else:
-              print("Invalid joint command message:", js)
       else:
           print("Unknown topic message:", msg.topic, msg.payload)
   

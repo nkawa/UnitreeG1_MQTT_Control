@@ -95,14 +95,14 @@ class UnitreeG1_JointController:
           mcmd.tau = 0.
 #          mcmd.kp = 60.
 #          mcmd.kd = 1.5
-          mcmd.kp = 20.
+          mcmd.kp = 15.
           mcmd.kd = 2.
           mcmd.tau_ff = 0.
         elif left != None and joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
           self.low_cmd.motor_cmd[joint].q = left[joint-G1JointIndex.LeftShoulderPitch]
           mcmd.q = left[joint-G1JointIndex.LeftShoulderPitch]
           mcmd.tau = 0.
-          mcmd.kp = 20.
+          mcmd.kp = 15.
           mcmd.kd = 2.
 #          mcmd.kp = 60.
 #          mcmd.kd = 1.5
@@ -115,8 +115,8 @@ class UnitreeG1_JointController:
           else:
             mcmd.q = 0
           mcmd.tau = 0.
-          mcmd.kp  = 60.
-          mcmd.dq  = lsms.dq
+          mcmd.kp  = 30.
+          mcmd.dq  = 0. #lsms.dq
           mcmd.kd  = 1.5
           mcmd.tau_ff = 0.
     
@@ -181,7 +181,7 @@ class UnitreeG1_JointController:
 
 
   def reset_left_arm(self):
-    print("Reset right!")
+    print("Reset LeftArm!")
  
     target =   [-0.10218948870897293, 0.1596677154302597, -0.04013517126441002, -0.01477654930204153, -0.08196011930704117, -0.0996243879199028, -0.11140535771846771]
 
@@ -207,16 +207,16 @@ class UnitreeG1_JointController:
           mcmd.q = right[index] 
           mcmd.dq = 0.
           mcmd.tau = 0.
-          mcmd.kp = 60.
+          mcmd.kp = 10.
           mcmd.kd = 1.5
           mcmd.tau_ff = 0.
-        elif left != None and joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
+        elif joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
           index =  joint-G1JointIndex.LeftShoulderPitch
           mcmd.q = self.mon.left[index]+ (diff[index]/div *(ita+1))
           mcmd.tau = 0.
-          mcmd.kp = 60.
-          mcmd.dq = 0.
+          mcmd.kp = 10.
           mcmd.kd = 1.5
+          mcmd.dq = 0.
           mcmd.tau_ff = 0.
         else:
           lsms = self.mon.low_state.motor_state[joint]
