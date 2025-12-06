@@ -79,13 +79,15 @@ class UnitreeG1_JointController:
 
         max_diff = np.abs(np_left - self.mon.left ).max() 
         if max_diff > 25.0/180*math.pi:
-          print("Detected large left diff in arm command:", max_diff, np_left, self.mon.left)
+          print("Detect large left diff")
+#          print("Detected large left diff in arm command:", max_diff, np_left, self.mon.left)
           return
         left = self.saved_left_command
            
       #for debug
 #      print("SR:", right)
 #      return
+      motorStates = self.mon.low_state.motor_state
       
       for i, joint in enumerate(self.arm_joints):
         mcmd = self.low_cmd.motor_cmd[joint]
@@ -95,30 +97,31 @@ class UnitreeG1_JointController:
           mcmd.tau = 0.
 #          mcmd.kp = 60.
 #          mcmd.kd = 1.5
-          mcmd.kp = 15.
+          mcmd.kp = 40.
           mcmd.kd = 2.
-          mcmd.tau_ff = 0.
+          mcmd.tau_ff = motorStates[joint].tau_est  # 重力補償を設定してみる
         elif left != None and joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
           self.low_cmd.motor_cmd[joint].q = left[joint-G1JointIndex.LeftShoulderPitch]
           mcmd.q = left[joint-G1JointIndex.LeftShoulderPitch]
           mcmd.tau = 0.
-          mcmd.kp = 15.
+          mcmd.kp = 40.
           mcmd.kd = 2.
 #          mcmd.kp = 60.
 #          mcmd.kd = 1.5
           mcmd.dq = 0.
-          mcmd.tau_ff = 0.
+          mcmd.tau_ff = motorStates[joint].tau_est  # 重力補償を設定してみる
+#          mcmd.tau_ff = 0.
         else:
-          lsms = self.mon.low_state.motor_state[joint]
+          lsms = motorStates[joint]
           if joint == G1JointIndex.WaistYaw:
             mcmd.q = self.waist_yaw
           else:
-            mcmd.q = 0
+            mcmd.q = lsms[joint].q # 現在の q を維持（左が無い場合）
           mcmd.tau = 0.
           mcmd.kp  = 30.
           mcmd.dq  = 0. #lsms.dq
           mcmd.kd  = 1.5
-          mcmd.tau_ff = 0.
+          mcmd.tau_ff = lsms[joint].tau_est
     
       self.low_cmd.crc = self.crc.Crc(self.low_cmd)
 # for sport debug
