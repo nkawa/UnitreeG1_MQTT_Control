@@ -85,6 +85,7 @@ class UnitreeG1_MQTT:
 #                      self.joint_controller.reset_right_arm()
 
       elif msg.topic == self.mqtt_ctrl_topic+"-left": # 制御コマンド受信
+           js = json.loads(msg.payload)
            left = js['joints']
            self.joint_controller.save_left_arm_command(left)
            if js['button'][0]: # close
