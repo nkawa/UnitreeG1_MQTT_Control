@@ -170,7 +170,7 @@ class ProcessManager:
         self.UniMQ = UnitreeG1_MQTT()
         self.UniMQ.connect_mqtt()
     
-    def start_monitor(self, logging_dir: str | None = None, disable_mqtt: bool = False):
+    def start_monitor(self):
         self.mon = UnitreeG1_JointMonitor(self.UniMQ.client)
 #        self.monP = Process(
 #            target=self.mon.run_proc,
