@@ -93,16 +93,20 @@ class UnitreeG1_JointController:
           mcmd.q = right[joint-G1JointIndex.RightShoulderPitch]
           mcmd.dq = 0.
           mcmd.tau = 0.
-          mcmd.kp = 60.
-          mcmd.kd = 1.5
+#          mcmd.kp = 60.
+#          mcmd.kd = 1.5
+          mcmd.kp = 20.
+          mcmd.kd = 2.
           mcmd.tau_ff = 0.
         elif left != None and joint >= G1JointIndex.LeftShoulderPitch and joint <= G1JointIndex.LeftWristYaw:          
           self.low_cmd.motor_cmd[joint].q = left[joint-G1JointIndex.LeftShoulderPitch]
           mcmd.q = left[joint-G1JointIndex.LeftShoulderPitch]
           mcmd.tau = 0.
-          mcmd.kp = 60.
+          mcmd.kp = 20.
+          mcmd.kd = 2.
+#          mcmd.kp = 60.
+#          mcmd.kd = 1.5
           mcmd.dq = 0.
-          mcmd.kd = 1.5
           mcmd.tau_ff = 0.
         else:
           lsms = self.mon.low_state.motor_state[joint]
