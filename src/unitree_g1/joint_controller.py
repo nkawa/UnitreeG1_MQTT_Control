@@ -116,12 +116,12 @@ class UnitreeG1_JointController:
           if joint == G1JointIndex.WaistYaw:
             mcmd.q = self.waist_yaw
           else:
-            mcmd.q = lsms[joint].q # 現在の q を維持（左が無い場合）
+            mcmd.q = lsms.q # 現在の q を維持（左が無い場合）
           mcmd.tau = 0.
           mcmd.kp  = 30.
           mcmd.dq  = 0. #lsms.dq
           mcmd.kd  = 1.5
-          mcmd.tau_ff = lsms[joint].tau_est
+          mcmd.tau_ff = lsms.tau_est
     
       self.low_cmd.crc = self.crc.Crc(self.low_cmd)
 # for sport debug
